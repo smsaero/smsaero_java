@@ -1,48 +1,52 @@
-# SmsAero Java Client
+# SmsAero Client library for Java
 
+Library for sending SMS messages using the SmsAero API. Written in Java.
 
-### Usage:
+## Installation
 
-    import org.json.simple.*;
-    
-    
-    public class Main {
-        
-        // Get credentials from account settings page: https://smsaero.ru/cabinet/settings/apikey/
-        private static final String email = "your email";
-        private static final String apiKey = "your api key";
-        private static final String sign = "SmsAero";
-    
-        public static void main(String[] args) {
-            SmsAeroClient client = new SmsAeroClient(email, apiKey);
-    
-            try {
-                JSONObject balanceResult = client.Balance();
-                JSONObject data = (JSONObject) balanceResult.get("data");
-                if (data.get("balance").equals(0.00)) {
-                    System.out.println("Insufficient balance.");
-                    System.exit(-1);
-                }
-    
-                JSONObject sendResult = client.Send("70000000000", "Hello, World!", sign);
-                if (sendResult == null) {
-                    System.out.println("Can not send sms.");
-                    System.exit(-1);
-                }
-                if (sendResult.get("success").equals(false)) {
-                    System.out.println(sendResult.get("reason"));
-                    System.exit(-1);
-                }
-                data = (JSONObject) sendResult.get("data");
-                System.out.println("Successfully sent.");
-                System.out.println(String.format("Msg ID: %d", data.get("id")));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+### Maven
+
+```xml
+<dependency>
+  <groupId>ru.smsaero</groupId>
+  <artifactId>smsaero</artifactId>
+  <version>3.0.0</version>
+</dependency>
+```
+
+### Gradle
+
+```
+implementation 'ru.smsaero:smsaero:3.0.0'
+```
+
+### Usage example:
+
+Get credentials from account settings page: https://smsaero.ru/cabinet/settings/apikey/
+
+```java
+import org.json.simple.JSONObject;
+import ru.smsaero.SmsAero;
+
+public class Main {
+    private static final String email = "your email";
+    private static final String apiKey = "your api key";
+
+    public static void main(String[] args) {
+        try {
+            SmsAero client = new SmsAero(email, apiKey);
+            JSONObject sendResult = client.SendSms("70000000000", "Hello, World!");
+            System.out.println(sendResult.toString());
+        } catch (Exception e) {
+            System.err.println("An error occurred: " + e.getMessage());
+            System.exit(-1);
         }
     }
-
+}
+```
 
 ### License
 
-    MIT License
+```
+MIT License
+```
