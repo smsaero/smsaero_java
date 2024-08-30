@@ -1,3 +1,5 @@
+package ru.smsaero;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -6,21 +8,20 @@ import org.json.simple.*;
 import org.json.simple.parser.*;
 
 
-public class SmsAeroClient {
+public class SmsAero {
     private static String _email;
     private static String _apiKey;
 
-    private static final List<String> _gateUrls = List.of(
+    private static final List<String> _gateUrls = Arrays.asList(
             "https://gate.smsaero.ru/v2/",
             "https://gate.smsaero.org/v2/",
-            "https://gate.smsaero.net/v2/",
-            "https://gate.smsaero.uz/v2/"
+            "https://gate.smsaero.net/v2/"
     );
     private String _baseDomain = null;
     private String _page = null;
     private Map<String, String> _postParam = null;
 
-    public SmsAeroClient(String emailAddr, String apiKey) {
+    public SmsAero(String emailAddr, String apiKey) {
         _email = emailAddr;
         _apiKey = apiKey;
     }
@@ -98,9 +99,8 @@ public class SmsAeroClient {
         URL urlObj = new URL(_getUrl(method));
         HttpURLConnection con = (HttpURLConnection) urlObj.openConnection();
         con.setRequestProperty ("Authorization", _getAuth());
-
         con.setRequestProperty("Content-Type", "application/json");
-        con.addRequestProperty("User-Agent", "Mozilla/4.0");
+        con.addRequestProperty("User-Agent", "SAJavaClient/2.0");
         con.setRequestMethod("POST");
         con.setDoOutput(true);
 
@@ -110,16 +110,27 @@ public class SmsAeroClient {
         os.flush();
         os.close();
 
-        if (con.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            JSONParser parser = new JSONParser();
-            Object obj = parser.parse(new BufferedReader(new InputStreamReader(con.getInputStream())));
-            JSONObject jsonObj = (JSONObject) obj;
-            return jsonObj;
+        int responseCode = con.getResponseCode();
+        BufferedReader reader;
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        } else {
+            reader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
         }
-		return null;
+
+        JSONParser parser = new JSONParser();
+        Object obj = parser.parse(reader);
+        JSONObject jsonObj = (JSONObject) obj;
+        if (jsonObj.get("success").equals(false)) {
+            if (jsonObj.get("message") != null) {
+                throw new IOException((String) jsonObj.get("message"));
+            }
+            throw new IOException((String) jsonObj.get("reason"));
+        }
+        return jsonObj;
 	}
 
-    public JSONObject Auth() throws IOException, ParseException {
+    public JSONObject IsAuthorized() throws IOException, ParseException {
         return _doRequest("auth", null);
     }
 
@@ -135,12 +146,16 @@ public class SmsAeroClient {
         return _doRequest("balance", null);
     }
 
-    public JSONObject Send(String number, String text, String sign) throws IOException, ParseException {
+    public JSONObject SendSms(String number, String text, String sign) throws IOException, ParseException {
         Map<String, String> data = new HashMap<String, String>();
         data.put("number", number);
         data.put("text", text);
         data.put("sign", sign);
         return _doRequest("sms/send", data);
+    }
+
+    public JSONObject SendSms(String number, String text) throws IOException, ParseException {
+        return SendSms(number, text, "SMS Aero");
     }
 
     public JSONObject SmsStatus(int smsId) throws IOException, ParseException {
@@ -152,7 +167,7 @@ public class SmsAeroClient {
     public JSONObject SmsList() throws IOException, ParseException {
         /*
             // Example
-            SmsAeroClient client = new SmsAeroClient(email, apiKey);
+            src.main.java.com.smsaero.SmsAeroClient client = new src.main.java.com.smsaero.SmsAeroClient(email, apiKey);
             client.SetPage(2);
             System.out.println(client.SmsList());
         */
@@ -223,7 +238,7 @@ public class SmsAeroClient {
     public JSONObject ContactAdd(String number) throws IOException, ParseException {
         /*
             // Example
-            SmsAeroClient client = new SmsAeroClient(email, apiKey);
+            src.main.java.com.smsaero.SmsAeroClient client = new src.main.java.com.smsaero.SmsAeroClient(email, apiKey);
             client.AddPostParam("fname", "First name");
             client.AddPostParam("lname", "Last name");
             System.out.println(client.ContactAdd("79038800350"));
