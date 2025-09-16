@@ -38,8 +38,14 @@ public class Main {
     public static void main(String[] args) {
         try {
             SmsAero client = new SmsAero(email, apiKey);
+
+            // Отправка SMS сообщения
             JSONObject sendResult = client.SendSms("70000000000", "Hello, World!");
             System.out.println(sendResult.toString());
+            
+            // Отправка Telegram кода
+            JSONObject telegramResult = client.SendTelegram("70000000000", 1234, "SMS Aero", "Ваш код 1234");
+            System.out.println(telegramResult.toString());
         } catch (Exception e) {
             System.err.println("An error occurred: " + e.getMessage());
             System.exit(-1);

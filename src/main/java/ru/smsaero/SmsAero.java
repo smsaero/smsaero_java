@@ -274,4 +274,26 @@ public class SmsAero {
     public JSONObject ViberList() throws IOException, ParseException {
         return _doRequest("viber/list", null);
     }
+
+    public JSONObject SendTelegram(String number, int code) throws IOException, ParseException {
+        Map<String, String> data = new HashMap<String, String>();
+        data.put("number", number);
+        data.put("code", Integer.toString(code));
+        return _doRequest("telegram/send", data);
+    }
+
+    public JSONObject SendTelegram(String number, int code, String sign, String text) throws IOException, ParseException {
+        Map<String, String> data = new HashMap<String, String>();
+        data.put("number", number);
+        data.put("code", Integer.toString(code));
+        data.put("sign", sign);
+        data.put("text", text);
+        return _doRequest("telegram/send", data);
+    }
+
+    public JSONObject TelegramStatus(int telegramId) throws IOException, ParseException {
+        Map<String, String> data = new HashMap<String, String>();
+        data.put("id", Integer.toString(telegramId));
+        return _doRequest("telegram/status", data);
+    }
 }
