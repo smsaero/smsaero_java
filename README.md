@@ -1,6 +1,5 @@
 # SmsAero Client library for Java
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/ru.smsaero/smsaero/badge.svg)](https://maven-badges.herokuapp.com/maven-central/ru.smsaero/smsaero)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Library for sending SMS messages using the SmsAero API. Written in Java.
@@ -13,14 +12,14 @@ Library for sending SMS messages using the SmsAero API. Written in Java.
 <dependency>
   <groupId>ru.smsaero</groupId>
   <artifactId>smsaero</artifactId>
-  <version>3.0.0</version>
+  <version>3.1.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```
-implementation 'ru.smsaero:smsaero:3.0.0'
+implementation 'ru.smsaero:smsaero:3.1.0'
 ```
 
 ### Usage example:
