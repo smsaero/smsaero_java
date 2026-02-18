@@ -2,3 +2,5 @@
 .m2/
 
 target/
+.env
+tests/

@@ -1,0 +1,106 @@
+stages:
+  - test
+  - compat
+  - build
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  DOCKER_IMAGE: "smsaero/smsaero_java"
+
+cache:
+  key: "${CI_JOB_NAME}"
+  paths:
+    - .m2/repository
+
+test:
+  stage: test
+  image: maven:3.9-eclipse-temurin-11
+  script:
+    - mvn test
+  artifacts:
+    when: always
+    reports:
+      junit: target/surefire-reports/TEST-*.xml
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+compat:java11:
+  stage: compat
+  image: maven:3.9-eclipse-temurin-11
+  needs: [test]
+  script:
+    - mvn test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+compat:java17:
+  stage: compat
+  image: maven:3.9-eclipse-temurin-17
+  needs: [compat:java11]
+  script:
+    - mvn test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+compat:java21:
+  stage: compat
+  image: maven:3.9-eclipse-temurin-21
+  needs: [compat:java17]
+  script:
+    - mvn test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+compat:java25:
+  stage: compat
+  image: maven:3.9-eclipse-temurin-25
+  needs: [compat:java21]
+  script:
+    - mvn test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+
+docker-build:
+  stage: build
+  image: docker:28
+  needs: [compat:java25]
+  services:
+    - docker:28-dind
+  script:
+    - VERSION=$(awk -F'[<>]' '/<version>/{print $3; exit}' pom.xml)
+    - docker build -t $DOCKER_IMAGE:$CI_PIPELINE_IID --build-arg VERSION=$VERSION .
+    - docker run --rm $DOCKER_IMAGE:$CI_PIPELINE_IID --help
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+docker-push:
+  stage: build
+  image: docker:28
+  needs: [compat:java25]
+  services:
+    - docker:28-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - VERSION=$(awk -F'[<>]' '/<version>/{print $3; exit}' pom.xml)
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID -t $CI_REGISTRY_IMAGE:latest --build-arg VERSION=$VERSION .
+    - docker push $CI_REGISTRY_IMAGE:$CI_PIPELINE_IID
+    - docker push $CI_REGISTRY_IMAGE:latest
+    - |
+      if [ -n "$CI_COMMIT_TAG" ]; then
+        docker tag $CI_REGISTRY_IMAGE:latest $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+        docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+      fi
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG

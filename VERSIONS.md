@@ -1,6 +1,6 @@
 # Versioning Strategy
 
-`SmsAero Api Client` uses a modified version of [Semantic Versioning][semver] for
+`SMS Aero Api Client` uses a modified version of [Semantic Versioning][semver] for
 all changes to project. It is strongly encouraged that you pin at
 least the major version and potentially the minor version to avoid pulling in
 breaking changes.
@@ -21,14 +21,14 @@ limited to a small number of function signature changes.
 The `MAJOR` version is used to indicate the family of technology represented by
 the helper project. Breaking changes that require extensive reworking of code
 will cause the `MAJOR` version to be incremented by one, and the `MINOR` and
-`PATCH` versions will be reset to zero. SmsAero understands that this can be very
+`PATCH` versions will be reset to zero. SMS Aero understands that this can be very
 disruptive, so we will only introduce this type of breaking change when
 absolutely necessary. New `MAJOR` versions will be communicated in advance with
 `Release Candidates` and a schedule.
 
 ## Supported Versions
 
-Only the current `MAJOR` version of `SmsAero Api Client` is supported. New
+Only the current `MAJOR` version of `SMS Aero Api Client` is supported. New
 features, functionality, bug fixes, and security updates will only be added to
 the current `MAJOR` version.
 

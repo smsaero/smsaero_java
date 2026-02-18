@@ -4,11 +4,11 @@
 
     <groupId>ru.smsaero</groupId>
     <artifactId>smsaero</artifactId>
-    <version>3.1.0</version>
+    <version>3.2.0</version>
     <packaging>jar</packaging>
 
-    <name>SmsAero Java SDK</name>
-    <description>The SmsAero Java client library</description>
+    <name>SMS Aero Java SDK</name>
+    <description>The SMS Aero Java client library</description>
     <url>https://github.com/smsaero/smsaero_java</url>
 
     <licenses>
@@ -21,9 +21,9 @@
 
     <developers>
         <developer>
-            <name>SmsAero</name>
+            <name>SMS Aero</name>
             <email>r.askarov@smsaero.ru</email>
-            <organization>SmsAero</organization>
+            <organization>SMS Aero</organization>
             <organizationUrl>https://www.smsaero.ru</organizationUrl>
         </developer>
     </developers>
@@ -64,15 +64,32 @@
             <artifactId>central-publishing-maven-plugin</artifactId>
             <version>0.5.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>11</source>
+                    <target>11</target>
+                </configuration>
+            </plugin>
             <!-- Maven Javadoc Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -155,6 +172,46 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
+            </plugin>
+            <!-- executable JAR for smsaero-cli -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.2</version>
+                <executions>
+                    <execution>
+                        <id>cli</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>org.sonatype.central:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>ru.smsaero.CommandLine</mainClass>
+                                </transformer>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>cli</shadedClassifierName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
         </plugins>
