@@ -683,4 +683,51 @@ public class SmsAero {
     public JSONObject TelegramStatus(int telegramId) throws IOException, ParseException {
         return doRequest("telegram/status", Map.of("id", Integer.toString(telegramId)));
     }
+
+    /**
+     * Sends a Mobile ID authorization request.
+     *
+     * @param number      Phone number (format 70000000000)
+     * @param sign        Sender signature for Mobile ID
+     * @param callbackUrl URL for receiving authorization status callbacks
+     * @return API response. Example: {@code {"data": {"id": 273, "number": "79031234567",
+     * "authType": "SIM-PUSH", "status": 0, "cost": 0}}}
+     * @throws IOException    on network error or API response with success=false
+     * @throws ParseException on JSON parse error
+     */
+    public JSONObject SendMobileId(String number, String sign, String callbackUrl) throws IOException, ParseException {
+        requireNonBlankAll("number", number, "sign", sign, "callbackUrl", callbackUrl);
+        return doRequest("mobile-id/send",
+            Map.of("number", number, "sign", sign, "callbackUrl", callbackUrl));
+    }
+
+    /**
+     * Retrieves the status of a Mobile ID request.
+     *
+     * @param reqId Mobile ID request identifier (from {@link #SendMobileId(String, String, String)})
+     * @return API response. Example: {@code {"data": {"id": 273, "number": "79031234567",
+     * "authType": "SMS", "status": 3, "cost": 0}}}
+     * @throws IOException    on network error or API response with success=false
+     * @throws ParseException on JSON parse error
+     */
+    public JSONObject MobileIdStatus(int reqId) throws IOException, ParseException {
+        return doRequest("mobile-id/status", Map.of("id", Integer.toString(reqId)));
+    }
+
+    /**
+     * Verifies a Mobile ID request with the provided code.
+     *
+     * @param reqId Mobile ID request identifier (from {@link #SendMobileId(String, String, String)})
+     * @param code  Verification code received by the user
+     * @param sign  Sender signature used in the original {@link #SendMobileId} request
+     * @return API response. Example: {@code {"data": {"id": 273, "number": "79031234567",
+     * "codeSms": "1234", "status": 3}}}
+     * @throws IOException    on network error or API response with success=false
+     * @throws ParseException on JSON parse error
+     */
+    public JSONObject VerifyMobileId(int reqId, String code, String sign) throws IOException, ParseException {
+        requireNonBlankAll("code", code, "sign", sign);
+        return doRequest("mobile-id/verify",
+            Map.of("id", Integer.toString(reqId), "code", code, "sign", sign));
+    }
 }

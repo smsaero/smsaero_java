@@ -4,7 +4,7 @@
 
     <groupId>ru.smsaero</groupId>
     <artifactId>smsaero</artifactId>
-    <version>3.2.0</version>
+    <version>3.3.0</version>
     <packaging>jar</packaging>
 
     <name>SMS Aero Java SDK</name>
