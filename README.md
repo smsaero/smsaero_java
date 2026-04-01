@@ -19,14 +19,14 @@ Library for sending SMS messages using the SMS Aero API. Written in Java.
 <dependency>
   <groupId>ru.smsaero</groupId>
   <artifactId>smsaero</artifactId>
-  <version>3.2.0</version>
+  <version>3.3.0</version>
 </dependency>
 ```
 
 ### Gradle
 
 ```
-implementation 'ru.smsaero:smsaero:3.2.0'
+implementation 'ru.smsaero:smsaero:3.3.0'
 ```
 
 ## Usage
@@ -81,10 +81,10 @@ Check status: `client.IsTestModeActive()`.
 
 ## Command-line interface (CLI)
 
-To send SMS from the command line, use the fat JAR `smsaero-3.2.0-cli.jar`:
+To send SMS from the command line, use the fat JAR `smsaero-3.3.0-cli.jar`:
 
 ```bash
-java -jar target/smsaero-3.2.0-cli.jar --email YOUR_EMAIL --api_key YOUR_API_KEY --phone 70000000000 --message "Hello"
+java -jar target/smsaero-3.3.0-cli.jar --email YOUR_EMAIL --api_key YOUR_API_KEY --phone 70000000000 --message "Hello"
 ```
 
 ### Docker
